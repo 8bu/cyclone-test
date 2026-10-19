@@ -4,11 +4,27 @@ import { createRoot } from "react-dom/client"
 import "./index.css"
 import App from "./App.tsx"
 import { ThemeProvider } from "@/components/theme-provider.tsx"
+import { worker } from "@/mocks/browser"
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  </StrictMode>
-)
+async function bootstrap() {
+  try {
+    await worker.start({
+      serviceWorker: { url: "/mockServiceWorker.js" },
+      onUnhandledFrame: "bypass",
+      quiet: true,
+    })
+  } catch (error) {
+    // Render anyway: the UI shows the API error state.
+    console.error("Failed to start the mock API worker", error)
+  }
+
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </StrictMode>
+  )
+}
+
+void bootstrap()
