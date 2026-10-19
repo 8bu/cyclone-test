@@ -10,7 +10,7 @@ Single-page app that shows a crypto portfolio (BTC, ETH, SOL, CKB, DOGE on Binan
 
 ## Deployment URL
 
-https://cyclone-portfolio.nguyenhoang.workers.dev
+https://cyclone.8bu.dev
 
 ## Local setup
 

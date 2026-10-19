@@ -15,17 +15,20 @@ The app is a static build deployed as a Cloudflare Worker with static assets, in
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  // Custom domain: Cloudflare creates the DNS record and certificate on deploy (zone 8bu.dev must be in this account).
+  "routes": [{ "pattern": "cyclone.8bu.dev", "custom_domain": true }]
 }
 ```
 
 | Key | Meaning |
 |---|---|
-| `name` | Worker name; it sets the default `<name>.<account-subdomain>.workers.dev` URL. |
+| `name` | Worker name. |
 | `compatibility_date` | Workers runtime compatibility date. |
 | `assets.directory` | The folder uploaded as static assets: the Vite build output `dist/`. |
 | `assets.not_found_handling: "single-page-application"` | When a navigation request matches no asset, Cloudflare serves `index.html` instead of a 404. Without it, opening or refreshing a deep link would 404. The app has no client-side routes today, but the setting keeps any path working. |
 | no `main` key | No Worker script runs. Cloudflare serves the assets directly. |
+| `routes[].custom_domain: true` | Attaches the Worker to `cyclone.8bu.dev`. Wrangler creates the DNS record and TLS certificate on deploy. The zone `8bu.dev` must be in the same Cloudflare account. Setting `routes` turns off the default `workers.dev` URL, so the app is reachable only on the custom domain. |
 
 There are no `vars`, secrets or bindings. The app has no environment variables.
 
@@ -50,7 +53,7 @@ Credentials are never committed.
 - Interactive: run `pnpm exec wrangler login` once on your machine. It opens a browser to authorize your Cloudflare account.
 - CI or non-interactive: set the environment variable `CLOUDFLARE_API_TOKEN` (an API token with permission to edit Workers) in the CI secret store, and `CLOUDFLARE_ACCOUNT_ID` if the token can access more than one account. Then run `pnpm run deploy`.
 
-After a successful deploy, Wrangler prints the live `workers.dev` URL.
+After a successful deploy, Wrangler prints the custom domain (`cyclone.8bu.dev`).
 
 ## Local preview
 
