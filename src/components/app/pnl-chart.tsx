@@ -1,7 +1,20 @@
 import { BarChartIcon } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from "recharts"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   ChartContainer,
   ChartTooltip,
@@ -59,7 +72,9 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
               Realized vs unrealized P&amp;L
             </h2>
           </CardTitle>
-          <CardDescription>Per asset, in USD. Bars below zero are losses.</CardDescription>
+          <CardDescription>
+            Per asset, in USD. Bars below zero are losses.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex min-w-0 flex-col gap-3">
           {rows.length === 0 ? (
@@ -81,7 +96,10 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                 aria-label={`Bar chart of realized and unrealized P&L per asset. ${summary}`}
                 className="min-w-0"
               >
-                <ChartContainer config={config} className="aspect-auto h-64 w-full sm:h-72">
+                <ChartContainer
+                  config={config}
+                  className="aspect-auto h-64 w-full sm:h-72"
+                >
                   <BarChart data={rows} margin={{ left: 0, right: 4, top: 8 }}>
                     <defs>
                       <pattern
@@ -91,8 +109,17 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                         height="6"
                         patternTransform="rotate(45)"
                       >
-                        <rect width="6" height="6" fill="var(--color-unrealized)" />
-                        <rect width="2" height="6" fill="var(--card)" fillOpacity="0.55" />
+                        <rect
+                          width="6"
+                          height="6"
+                          fill="var(--color-unrealized)"
+                        />
+                        <rect
+                          width="2"
+                          height="6"
+                          fill="var(--card)"
+                          fillOpacity="0.55"
+                        />
                       </pattern>
                     </defs>
                     <CartesianGrid vertical={false} />
@@ -111,7 +138,11 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                       tick={{ fontSize: 11 }}
                       tickFormatter={(v: number) => formatCompactUsd(v)}
                     />
-                    <ReferenceLine y={0} stroke="var(--foreground)" strokeOpacity={0.5} />
+                    <ReferenceLine
+                      y={0}
+                      stroke="var(--foreground)"
+                      strokeOpacity={0.5}
+                    />
                     <ChartTooltip
                       content={
                         <ChartTooltipContent
@@ -132,7 +163,9 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                                 />
                                 <span className="flex flex-1 justify-between gap-4">
                                   <span className="text-muted-foreground">
-                                    {key === "realized" ? "Realized" : "Unrealized"}
+                                    {key === "realized"
+                                      ? "Realized"
+                                      : "Unrealized"}
                                   </span>
                                   <span className="font-mono font-medium tabular-nums">
                                     {formatSignedUsd(exact)}
@@ -144,7 +177,11 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                         />
                       }
                     />
-                    <Bar dataKey="realized" fill="var(--color-realized)" radius={3} />
+                    <Bar
+                      dataKey="realized"
+                      fill="var(--color-realized)"
+                      radius={3}
+                    />
                     <Bar
                       dataKey="unrealized"
                       fill="url(#pnl-unrealized-hatch)"
@@ -181,30 +218,34 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                   Unrealized
                 </li>
               </ul>
-              <table className="sr-only">
-                <caption>Realized and unrealized P&amp;L per asset (USD)</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Asset</th>
-                    <th scope="col">Realized</th>
-                    <th scope="col">Unrealized</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.symbol}>
-                      <th scope="row">{r.symbol}</th>
-                      <td>{formatSignedUsd(r.realizedStr)}</td>
-                      <td>{formatSignedUsd(r.unrealizedStr)}</td>
+              <div className="sr-only">
+                <table>
+                  <caption>
+                    Realized and unrealized P&amp;L per asset (USD)
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Asset</th>
+                      <th scope="col">Realized</th>
+                      <th scope="col">Unrealized</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.symbol}>
+                        <th scope="row">{r.symbol}</th>
+                        <td>{formatSignedUsd(r.realizedStr)}</td>
+                        <td>{formatSignedUsd(r.unrealizedStr)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               {unpriced.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  No price for {unpriced.join(", ")}: unrealized P&amp;L is shown
-                  as $0.00 for {unpriced.length === 1 ? "it" : "them"} and is
-                  excluded from the totals.
+                  No price for {unpriced.join(", ")}: unrealized P&amp;L is
+                  shown as $0.00 for {unpriced.length === 1 ? "it" : "them"} and
+                  is excluded from the totals.
                 </p>
               )}
             </>
