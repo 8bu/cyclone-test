@@ -105,6 +105,16 @@ All responses are JSON except `GET /api/trades.csv`. Error bodies are `{ "error"
 - The page has a skip-to-content link and a focusable `main` landmark. Dialogs use Radix (focus trap, `DialogTitle`, `DialogDescription`). The scrollable import issue list is a focusable labelled region.
 - Chart and table values come from the same `PortfolioResponse`, so they match.
 
+## Responsive layout
+
+Mobile first with Tailwind breakpoints. Verified with no page-level horizontal overflow from 320 px to 1440 px.
+
+- Below `lg` (1024 px), Holdings and Transactions render as card lists (1 column, 2 columns from `sm`). From `lg` they render as tables. Only one variant is in the DOM layout at a time (`hidden`/`lg:hidden`), so screen readers read one of them.
+- Below `xl`, the holdings table folds Avg cost and Cost basis under Quantity and Value, and the transactions table hides "Avg cost after", so the tables fit at 1024 px without sideways scrolling. The table wrappers keep `overflow-x-auto` as a safety net.
+- Below `md`, controls are at least 40 px tall (44 px for primary actions) for touch. Header actions are a 2-column grid on phones.
+- Summary cards are 2 columns up to `lg`, 3 from `lg`. Chart cards are 1 column below `lg`.
+- The import dialog fits the viewport (`100dvh`) and scrolls inside.
+
 ## Why MSW works in production on Workers static assets
 
 MSW intercepts `fetch` inside the browser through a service worker, not through a server. The built app ships `mockServiceWorker.js` (copied from `public/` into `dist/`). Cloudflare serves it as a static asset at `/mockServiceWorker.js`, with the same origin as the page, which is what service-worker registration requires. `main.tsx` registers it before rendering, so `/api/*` requests are answered in the browser and never reach Cloudflare. The assets config needs no Worker script ([deployment.md](deployment.md)). `onUnhandledFrame: "bypass"` lets every non-API request (the JS, CSS and font assets) go to the network normally.
