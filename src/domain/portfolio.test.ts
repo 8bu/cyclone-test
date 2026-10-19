@@ -117,6 +117,19 @@ describe("computePortfolio - cost basis", () => {
     expect(holding(reopened.holdings, "BTC")).toMatchObject({ quantity: "1", costBasis: "51", avgCost: "51", realizedPnl: "78.7" })
   })
 
+  it("rounds the cost removed on a partial SELL to 30 dp yet keeps realized P&L exact over a full close", () => {
+    const p = computePortfolio(
+      load("T1 1 Binance BTC BUY 3 10 0.01", "T2 2 Binance BTC SELL 1 11 0", "T3 3 Binance BTC SELL 2 11 0"),
+      null
+    )
+    // cost = 3x10 + 0.01 = 30.01. SELL 1: removed = 30.01/3 = 10.00333... -> 30 dp
+    expect(p.effects["T2"].realizedPnl).toBe("0.996666666666666666666666666667")
+    expect(p.effects["T2"].costBasisAfter).toBe("20.006666666666666666666666666667")
+    // The full close removes the remaining basis exactly, so realized sums to proceeds - cost = 33 - 30.01 = 2.99
+    expect(p.effects["T3"]).toMatchObject({ quantityAfter: "0", costBasisAfter: "0", realizedPnl: "1.993333333333333333333333333333" })
+    expect(p.summary.realizedPnl).toBe("2.99")
+  })
+
   it("pools across exchanges and keeps symbols separate", () => {
     const p = computePortfolio(
       load("T1 1 Binance BTC BUY 1 100 0", "T2 2 Coinbase BTC SELL 1 150 0", "T3 3 Binance ETH BUY 2 10 0"),
