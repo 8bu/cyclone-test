@@ -11,7 +11,7 @@ function errorResponse(status: number, body: ApiError) {
 }
 
 /** Adds latency and turns unexpected throws into a generic 500 (no stack leaked). */
-function guarded(
+export function guarded(
   action: string,
   resolver: (request: Request) => Promise<Response> | Response
 ) {

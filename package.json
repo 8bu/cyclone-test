@@ -11,6 +11,8 @@
     "typecheck": "tsc -b",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
     "test:watch": "vitest",
     "deploy": "pnpm build && wrangler deploy",
     "preview:worker": "pnpm build && wrangler dev"
@@ -32,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",

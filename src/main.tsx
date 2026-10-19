@@ -18,6 +18,12 @@ async function bootstrap() {
     console.error("Failed to start the mock API worker", error)
   }
 
+  // Dynamic on purpose: a static import would ship the test hook in production builds.
+  if (import.meta.env.MODE === "e2e") {
+    const { installE2eHook } = await import("@/mocks/e2e")
+    installE2eHook(worker)
+  }
+
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <ThemeProvider>
