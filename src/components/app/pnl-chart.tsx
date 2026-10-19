@@ -4,8 +4,6 @@ import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recha
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
@@ -137,7 +135,6 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                         />
                       }
                     />
-                    <ChartLegend content={<ChartLegendContent />} />
                     <Bar dataKey="realized" fill="var(--color-realized)" radius={3} />
                     <Bar
                       dataKey="unrealized"
@@ -149,6 +146,32 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                   </BarChart>
                 </ChartContainer>
               </div>
+              <ul
+                aria-label="Legend"
+                className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs"
+              >
+                <li className="flex items-center gap-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="size-3 shrink-0 rounded-[2px]"
+                    style={{ backgroundColor: "var(--color-realized)" }}
+                  />
+                  Realized
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="size-3 shrink-0 rounded-[2px] border"
+                    style={{
+                      borderColor: "var(--color-unrealized)",
+                      backgroundColor: "var(--color-unrealized)",
+                      backgroundImage:
+                        "repeating-linear-gradient(135deg, transparent 0 2px, var(--card) 2px 3px)",
+                    }}
+                  />
+                  Unrealized
+                </li>
+              </ul>
               <table className="sr-only">
                 <caption>Realized and unrealized P&amp;L per asset (USD)</caption>
                 <thead>

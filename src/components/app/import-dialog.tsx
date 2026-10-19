@@ -3,6 +3,7 @@ import { AlertTriangleIcon, UploadIcon } from "lucide-react"
 
 import { SAMPLE_CSV_URL } from "@/api/client"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -30,12 +31,6 @@ const MAX_ISSUES_SHOWN = 50
 interface Failure {
   message: string
   issues: ImportIssue[]
-}
-
-function describeIssue(issue: ImportIssue) {
-  return [issue.row === null ? "File" : `Row ${issue.row}`, issue.field, issue.message]
-    .filter((part) => part !== null && part !== "")
-    .join(" · ")
 }
 
 function ImportForm({
@@ -137,8 +132,13 @@ function ImportForm({
                   className="mt-1 flex max-h-48 flex-col gap-1 overflow-y-auto rounded-md border border-border p-2 text-xs outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   {shown.map((issue, i) => (
-                    <li key={i} className="break-words">
-                      {describeIssue(issue)}
+                    <li key={i} className="flex items-start gap-2 break-words">
+                      {issue.field && (
+                        <Badge variant="outline" className="shrink-0">
+                          {issue.field}
+                        </Badge>
+                      )}
+                      <span className="min-w-0">{issue.message}</span>
                     </li>
                   ))}
                 </ul>

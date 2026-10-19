@@ -40,9 +40,12 @@ function AllocationCell({ allocation }: { allocation: string | null }) {
       <span>{formatPercent(allocation)}</span>
       <div
         aria-hidden="true"
-        className="h-1.5 w-12 shrink-0 overflow-hidden rounded-full bg-muted"
+        className="relative h-2 w-24 shrink-0 overflow-hidden rounded-full bg-muted"
       >
-        <div className="h-full rounded-full bg-primary" style={{ width: `${width}%` }} />
+        <div
+          className="absolute inset-y-0 left-0 bg-primary"
+          style={{ width: `${width.toFixed(2)}%` }}
+        />
       </div>
     </div>
   )
