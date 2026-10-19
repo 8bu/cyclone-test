@@ -1,5 +1,12 @@
-import { useMemo, useState } from "react"
-import { ArrowDownIcon, ArrowUpIcon, FilterXIcon, SearchXIcon } from "lucide-react"
+import { useMemo, useState, type ReactNode } from "react"
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FilterXIcon,
+  SearchXIcon,
+} from "lucide-react"
 
 import { PnlValue } from "@/components/app/pnl-value"
 import { Badge } from "@/components/ui/badge"
@@ -89,6 +96,7 @@ const INITIAL: Filters = {
 
 const NUM = "text-right tabular-nums"
 const STICKY_CELL = "sticky left-0 z-10 bg-card"
+const TRIGGER = "w-full data-[size=default]:h-10 lg:data-[size=default]:h-8"
 
 function applyFilters(trades: Trade[], f: Filters) {
   const query = f.query.trim().toLowerCase()
@@ -111,6 +119,68 @@ function applyFilters(trades: Trade[], f: Filters) {
         : a.timestamp < b.timestamp
           ? -1
           : 1)
+  )
+}
+
+function Datum({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}) {
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="text-sm tabular-nums">{children}</dd>
+    </div>
+  )
+}
+
+/** One trade as a card, used below `md` where the 11-column table does not fit. */
+function TradeCard({
+  trade: t,
+  effect,
+}: {
+  trade: Trade
+  effect: TradeEffect | undefined
+}) {
+  return (
+    <li className="flex flex-col gap-3 rounded-lg border p-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs font-medium">{t.tradeId}</span>
+          <Badge variant={t.side === "BUY" ? "secondary" : "outline"}>
+            {t.side}
+          </Badge>
+        </div>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {formatDateTimeUtc(t.timestamp)}
+        </span>
+      </div>
+      <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+        <span className="font-medium">{t.symbol}</span>
+        <span className="text-muted-foreground">{t.exchange}</span>
+      </p>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+        <Datum label="Quantity">{formatQuantity(t.quantity)}</Datum>
+        <Datum label="Price">{formatPrice(t.priceUsd)}</Datum>
+        <Datum label="Gross value">{formatUsd(t.grossValueUsd)}</Datum>
+        <Datum label="Fee">{formatUsd(t.feeUsd)}</Datum>
+        <Datum label="Realized P&L">
+          {effect?.realizedPnl ? (
+            <PnlValue value={effect.realizedPnl} align="start" />
+          ) : (
+            <span className="text-muted-foreground">{EM_DASH}</span>
+          )}
+        </Datum>
+        <Datum label="Avg cost after">
+          {effect && effect.quantityAfter !== "0"
+            ? formatPrice(effect.avgCostAfter)
+            : EM_DASH}
+        </Datum>
+      </dl>
+    </li>
   )
 }
 
@@ -174,11 +244,11 @@ export function TransactionsExplorer({
             aria-label="Filter transactions"
             onSubmit={(e) => e.preventDefault()}
           >
-            <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <Field>
                 <FieldLabel htmlFor="filter-asset">Asset</FieldLabel>
                 <Select value={asset} onValueChange={(v) => update({ asset: v })}>
-                  <SelectTrigger id="filter-asset" className="w-full">
+                  <SelectTrigger id="filter-asset" className={TRIGGER}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -196,7 +266,7 @@ export function TransactionsExplorer({
               <Field>
                 <FieldLabel htmlFor="filter-exchange">Exchange</FieldLabel>
                 <Select value={exchange} onValueChange={(v) => update({ exchange: v })}>
-                  <SelectTrigger id="filter-exchange" className="w-full">
+                  <SelectTrigger id="filter-exchange" className={TRIGGER}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -218,11 +288,18 @@ export function TransactionsExplorer({
                   variant="outline"
                   value={side}
                   aria-labelledby="filter-side-label"
+                  className="w-full"
                   onValueChange={(v) => update({ side: v === "" ? ALL : v })}
                 >
-                  <ToggleGroupItem value={ALL}>All</ToggleGroupItem>
-                  <ToggleGroupItem value="BUY">BUY</ToggleGroupItem>
-                  <ToggleGroupItem value="SELL">SELL</ToggleGroupItem>
+                  <ToggleGroupItem value={ALL} className="h-10 flex-1 lg:h-8">
+                    All
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="BUY" className="h-10 flex-1 lg:h-8">
+                    BUY
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="SELL" className="h-10 flex-1 lg:h-8">
+                    SELL
+                  </ToggleGroupItem>
                 </ToggleGroup>
               </Field>
               <Field>
@@ -230,6 +307,7 @@ export function TransactionsExplorer({
                 <Input
                   id="filter-search"
                   type="search"
+                  className="h-10 lg:h-8"
                   placeholder="e.g. TRD-0042"
                   value={query}
                   onChange={(e) => update({ query: e.target.value })}
@@ -240,6 +318,7 @@ export function TransactionsExplorer({
                 <Input
                   id="filter-from"
                   type="date"
+                  className="h-10 lg:h-8"
                   value={from}
                   max={to || undefined}
                   onChange={(e) => update({ from: e.target.value })}
@@ -250,16 +329,17 @@ export function TransactionsExplorer({
                 <Input
                   id="filter-to"
                   type="date"
+                  className="h-10 lg:h-8"
                   value={to}
                   min={from || undefined}
                   onChange={(e) => update({ to: e.target.value })}
                 />
               </Field>
-              <Field className="justify-end sm:col-span-2 lg:col-span-2 lg:items-end">
+              <Field className="justify-end">
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full sm:w-fit"
+                  className="h-10 w-full lg:h-8 lg:w-fit"
                   onClick={clear}
                   disabled={!isFiltered}
                 >
@@ -285,7 +365,7 @@ export function TransactionsExplorer({
               </EmptyHeader>
               {isFiltered && (
                 <EmptyContent>
-                  <Button variant="outline" onClick={clear}>
+                  <Button variant="outline" className="h-10 lg:h-8" onClick={clear}>
                     <FilterXIcon data-icon="inline-start" />
                     Clear filters
                   </Button>
@@ -294,90 +374,171 @@ export function TransactionsExplorer({
             </Empty>
           ) : (
             <>
-              <Table>
-                <TableCaption className="sr-only">
-                  Transactions, {dir === "desc" ? "newest" : "oldest"} first.
-                  Showing {start + 1} to {start + visible.length} of{" "}
-                  {filtered.length}.
-                </TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead scope="col" className={cn(STICKY_CELL, "px-2")}>
-                      Trade ID
-                    </TableHead>
-                    <TableHead
-                      scope="col"
-                      aria-sort={dir === "asc" ? "ascending" : "descending"}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="-ml-2"
-                        onClick={() => update({ dir: dir === "asc" ? "desc" : "asc" })}
-                        title={`Sort ${dir === "asc" ? "newest" : "oldest"} first`}
-                      >
-                        Time (UTC)
-                        {dir === "asc" ? (
-                          <ArrowUpIcon data-icon="inline-end" />
-                        ) : (
-                          <ArrowDownIcon data-icon="inline-end" />
-                        )}
-                      </Button>
-                    </TableHead>
-                    <TableHead scope="col">Exchange</TableHead>
-                    <TableHead scope="col">Asset</TableHead>
-                    <TableHead scope="col">Side</TableHead>
-                    <TableHead scope="col" className={NUM}>Quantity</TableHead>
-                    <TableHead scope="col" className={NUM}>Price</TableHead>
-                    <TableHead scope="col" className={NUM}>Gross value</TableHead>
-                    <TableHead scope="col" className={NUM}>Fee</TableHead>
-                    <TableHead scope="col" className={NUM}>Realized P&amp;L</TableHead>
-                    <TableHead scope="col" className={NUM}>Avg cost after</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {visible.map((t) => {
-                    const effect = effects[t.tradeId]
-                    return (
-                      <TableRow key={t.tradeId}>
-                        <TableHead scope="row" className={cn(STICKY_CELL, "px-2 font-mono text-xs")}>
-                          {t.tradeId}
-                        </TableHead>
-                        <TableCell>{formatDateTimeUtc(t.timestamp)}</TableCell>
-                        <TableCell>{t.exchange}</TableCell>
-                        <TableCell className="font-medium">{t.symbol}</TableCell>
-                        <TableCell>
-                          <Badge variant={t.side === "BUY" ? "secondary" : "outline"}>
-                            {t.side}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className={NUM}>{formatQuantity(t.quantity)}</TableCell>
-                        <TableCell className={NUM}>{formatPrice(t.priceUsd)}</TableCell>
-                        <TableCell className={NUM}>{formatUsd(t.grossValueUsd)}</TableCell>
-                        <TableCell className={NUM}>{formatUsd(t.feeUsd)}</TableCell>
-                        <TableCell className={NUM}>
-                          {effect?.realizedPnl ? (
-                            <PnlValue value={effect.realizedPnl} />
-                          ) : (
-                            <span className="text-muted-foreground">{EM_DASH}</span>
-                          )}
-                        </TableCell>
-                        <TableCell className={NUM}>
-                          {effect && effect.quantityAfter !== "0"
-                            ? formatPrice(effect.avgCostAfter)
-                            : EM_DASH}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+              <div className="flex flex-col gap-3 lg:hidden">
+                <div className="flex flex-col gap-1.5">
+                  <span
+                    id="sort-time-label"
+                    className="text-sm font-medium"
+                  >
+                    Sort by time
+                  </span>
+                  <ToggleGroup
+                    type="single"
+                    variant="outline"
+                    value={dir}
+                    aria-labelledby="sort-time-label"
+                    className="w-full"
+                    onValueChange={(v) => {
+                      if (v === "asc" || v === "desc") update({ dir: v })
+                    }}
+                  >
+                    <ToggleGroupItem value="desc" className="h-10 flex-1">
+                      Newest first
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="asc" className="h-10 flex-1">
+                      Oldest first
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+                <ul
+                  aria-label="Transactions"
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                >
+                  {visible.map((t) => (
+                    <TradeCard
+                      key={t.tradeId}
+                      trade={t}
+                      effect={effects[t.tradeId]}
+                    />
+                  ))}
+                </ul>
+              </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="hidden lg:block">
+                <Table className="text-xs xl:text-sm">
+                  <TableCaption className="sr-only">
+                    Transactions, {dir === "desc" ? "newest" : "oldest"} first.
+                    Showing {start + 1} to {start + visible.length} of{" "}
+                    {filtered.length}.
+                  </TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead scope="col" className={cn(STICKY_CELL, "px-2")}>
+                        Trade ID
+                      </TableHead>
+                      <TableHead
+                        scope="col"
+                        className="px-2"
+                        aria-sort={dir === "asc" ? "ascending" : "descending"}
+                      >
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-2"
+                          onClick={() => update({ dir: dir === "asc" ? "desc" : "asc" })}
+                          title={`Sort ${dir === "asc" ? "newest" : "oldest"} first`}
+                        >
+                          Time (UTC)
+                          {dir === "asc" ? (
+                            <ArrowUpIcon data-icon="inline-end" />
+                          ) : (
+                            <ArrowDownIcon data-icon="inline-end" />
+                          )}
+                        </Button>
+                      </TableHead>
+                      <TableHead scope="col" className="px-2">Exchange</TableHead>
+                      <TableHead scope="col" className="px-2">Asset</TableHead>
+                      <TableHead scope="col" className="px-2">Side</TableHead>
+                      <TableHead scope="col" className={cn(NUM, "px-2")}>Quantity</TableHead>
+                      <TableHead scope="col" className={cn(NUM, "px-2")}>Price</TableHead>
+                      <TableHead scope="col" className={cn(NUM, "px-2")}>Gross value</TableHead>
+                      <TableHead scope="col" className={cn(NUM, "px-2")}>Fee</TableHead>
+                      <TableHead scope="col" className={cn(NUM, "px-2")}>Realized P&amp;L</TableHead>
+                      <TableHead
+                        scope="col"
+                        className={cn(NUM, "hidden px-2 xl:table-cell")}
+                      >
+                        Avg cost after
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {visible.map((t) => {
+                      const effect = effects[t.tradeId]
+                      return (
+                        <TableRow key={t.tradeId}>
+                          <TableHead scope="row" className={cn(STICKY_CELL, "px-2 font-mono text-xs")}>
+                            {t.tradeId}
+                          </TableHead>
+                          <TableCell className="px-2">{formatDateTimeUtc(t.timestamp)}</TableCell>
+                          <TableCell className="px-2">{t.exchange}</TableCell>
+                          <TableCell className="px-2 font-medium">{t.symbol}</TableCell>
+                          <TableCell className="px-2">
+                            <Badge variant={t.side === "BUY" ? "secondary" : "outline"}>
+                              {t.side}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className={cn(NUM, "px-2")}>{formatQuantity(t.quantity)}</TableCell>
+                          <TableCell className={cn(NUM, "px-2")}>{formatPrice(t.priceUsd)}</TableCell>
+                          <TableCell className={cn(NUM, "px-2")}>{formatUsd(t.grossValueUsd)}</TableCell>
+                          <TableCell className={cn(NUM, "px-2")}>{formatUsd(t.feeUsd)}</TableCell>
+                          <TableCell className={cn(NUM, "px-2")}>
+                            {effect?.realizedPnl ? (
+                              <PnlValue value={effect.realizedPnl} />
+                            ) : (
+                              <span className="text-muted-foreground">{EM_DASH}</span>
+                            )}
+                          </TableCell>
+                          <TableCell className={cn(NUM, "hidden px-2 xl:table-cell")}>
+                            {effect && effect.quantityAfter !== "0"
+                              ? formatPrice(effect.avgCostAfter)
+                              : EM_DASH}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <p className="text-sm text-muted-foreground" aria-live="polite">
                   Showing {start + 1}–{start + visible.length} of {filtered.length}
                 </p>
-                <Pagination className="mx-0 w-auto justify-start sm:justify-end">
+                <nav
+                  aria-label="pagination"
+                  className="flex items-center justify-between gap-3 lg:hidden"
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 flex-1"
+                    aria-label="Go to previous page"
+                    disabled={page <= 1}
+                    onClick={() => goTo(page - 1)}
+                  >
+                    <ChevronLeftIcon data-icon="inline-start" />
+                    Previous
+                  </Button>
+                  <span
+                    className="text-sm whitespace-nowrap tabular-nums"
+                    aria-live="polite"
+                  >
+                    Page {page} of {pageCount}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 flex-1"
+                    aria-label="Go to next page"
+                    disabled={page >= pageCount}
+                    onClick={() => goTo(page + 1)}
+                  >
+                    Next
+                    <ChevronRightIcon data-icon="inline-end" />
+                  </Button>
+                </nav>
+                <Pagination className="mx-0 hidden w-auto justify-end lg:flex">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
@@ -415,7 +576,7 @@ export function TransactionsExplorer({
           )}
 
           <p
-            className="flex flex-wrap gap-x-4 gap-y-1 border-t pt-3 text-sm tabular-nums"
+            className="flex flex-col gap-1 border-t pt-3 text-sm tabular-nums sm:flex-row sm:flex-wrap sm:gap-x-4"
             aria-live="polite"
           >
             <span>

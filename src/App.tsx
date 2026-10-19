@@ -44,7 +44,7 @@ export function App() {
   const hasData = status === "ready" && data !== null
 
   return (
-    <div className="min-h-svh bg-background text-foreground">
+    <div className="min-h-svh bg-background pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] text-foreground">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
@@ -61,7 +61,7 @@ export function App() {
       <main
         id="main"
         tabIndex={-1}
-        className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-6 px-4 py-6 outline-none sm:px-6"
+        className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-6 px-4 py-6 outline-none sm:px-6 md:gap-8 lg:px-8"
       >
         {importedNotice && hasData && (
           <Alert>
@@ -106,7 +106,7 @@ export function App() {
                   holdings={data.portfolio.holdings}
                   summary={data.portfolio.summary}
                 />
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2">
                   <AllocationChart
                     holdings={data.portfolio.holdings}
                     totalValue={data.portfolio.summary.portfolioValue}

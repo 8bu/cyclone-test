@@ -67,7 +67,7 @@ export function AllocationChart({
 
   return (
     <section aria-labelledby="allocation-heading" className="min-w-0">
-      <Card className="h-full">
+      <Card className="h-full min-w-0">
         <CardHeader>
           <CardTitle>
             <h2 id="allocation-heading" className="text-base font-medium">
@@ -76,7 +76,7 @@ export function AllocationChart({
           </CardTitle>
           <CardDescription>Share of current portfolio value by asset.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-w-0">
           {slices.length === 0 ? (
             <Empty className="border">
               <EmptyHeader>
@@ -90,11 +90,11 @@ export function AllocationChart({
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="flex flex-col items-center gap-6 sm:flex-row">
+            <div className="flex flex-col items-center gap-6 sm:flex-row lg:flex-col xl:flex-row">
               <div
                 role="img"
                 aria-label={`Allocation donut chart of ${formatUsd(totalValue)}: ${summary}`}
-                className="relative w-full max-w-56 shrink-0"
+                className="relative mx-auto w-full max-w-60 sm:mx-0 sm:w-52 sm:shrink-0 lg:mx-auto lg:w-full xl:mx-0 xl:w-56"
               >
                 <ChartContainer config={config} className="aspect-square w-full">
                   <PieChart>
@@ -141,7 +141,10 @@ export function AllocationChart({
               </div>
               <ul className="flex w-full min-w-0 flex-1 flex-col gap-2" aria-label="Allocation by asset">
                 {slices.map((s) => (
-                  <li key={s.symbol} className="flex items-center gap-2 text-sm">
+                  <li
+                    key={s.symbol}
+                    className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm"
+                  >
                     <span
                       aria-hidden="true"
                       className="size-3 shrink-0 rounded-[3px] border border-border"
@@ -151,7 +154,7 @@ export function AllocationChart({
                     <span className="ml-auto text-muted-foreground tabular-nums">
                       {formatPercent(s.allocationStr)}
                     </span>
-                    <span className="w-24 text-right tabular-nums">{formatUsd(s.valueStr)}</span>
+                    <span className="min-w-24 text-right tabular-nums">{formatUsd(s.valueStr)}</span>
                   </li>
                 ))}
               </ul>

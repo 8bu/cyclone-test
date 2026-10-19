@@ -49,11 +49,12 @@ export class ErrorBoundary extends Component<
         <AlertTitle>Something went wrong</AlertTitle>
         <AlertDescription>
           <p>{error.message || "An unexpected error occurred while rendering."}</p>
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.location.reload()}
+              className="h-11 w-full sm:h-10 sm:w-auto md:h-7"
             >
               <RotateCcwIcon data-icon="inline-start" />
               Reload page

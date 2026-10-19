@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
-import { AlertTriangleIcon, UploadIcon } from "lucide-react"
+import { AlertTriangleIcon, UploadIcon, XIcon } from "lucide-react"
 
 import { SAMPLE_CSV_URL } from "@/api/client"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -71,7 +71,7 @@ function ImportForm({
   const hidden = (failure?.issues.length ?? 0) - shown.length
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex min-w-0 flex-col gap-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="import-file">CSV file</FieldLabel>
@@ -81,8 +81,9 @@ function ImportForm({
             accept=".csv,text/csv"
             onChange={onFile}
             disabled={busy}
+            className="h-10 file:h-7 md:h-8 md:file:h-6"
           />
-          <FieldDescription>
+          <FieldDescription className="[&_code]:break-all">
             {fileName ? `Loaded ${fileName}. ` : ""}
             Required columns: <code>{TRADE_COLUMNS.join(", ")}</code>.{" "}
             <a href={SAMPLE_CSV_URL} download="trades.csv" className="underline underline-offset-3">
@@ -101,7 +102,7 @@ function ImportForm({
             }}
             placeholder={TRADE_COLUMNS.join(",")}
             rows={6}
-            className="font-mono text-xs"
+            className="max-h-[40dvh] min-h-28 font-mono text-base md:text-xs"
             spellCheck={false}
             disabled={busy}
           />
@@ -155,11 +156,11 @@ function ImportForm({
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button" variant="outline" disabled={busy}>
+          <Button type="button" variant="outline" disabled={busy} className="h-10 md:h-8">
             Cancel
           </Button>
         </DialogClose>
-        <Button type="submit" disabled={busy || text.trim() === ""}>
+        <Button type="submit" disabled={busy || text.trim() === ""} className="h-10 md:h-8">
           {busy ? <Spinner data-icon="inline-start" /> : <UploadIcon data-icon="inline-start" />}
           Import trades
         </Button>
@@ -183,8 +184,22 @@ export function ImportDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
-      <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-xl">
-        <DialogHeader>
+      <DialogContent
+        showCloseButton={false}
+        className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-xl"
+      >
+        <DialogClose asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={busy}
+            className="absolute top-1 right-1 size-10 md:top-2 md:right-2 md:size-7"
+          >
+            <XIcon />
+            <span className="sr-only">Close</span>
+          </Button>
+        </DialogClose>
+        <DialogHeader className="pr-10">
           <DialogTitle>Import trades.csv</DialogTitle>
           <DialogDescription>
             Replace the current dataset with your own trades. Choose a file or

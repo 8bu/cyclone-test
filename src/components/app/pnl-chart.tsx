@@ -52,7 +52,7 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
 
   return (
     <section aria-labelledby="pnl-heading" className="min-w-0">
-      <Card className="h-full">
+      <Card className="h-full min-w-0">
         <CardHeader>
           <CardTitle>
             <h2 id="pnl-heading" className="text-base font-medium">
@@ -61,7 +61,7 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
           </CardTitle>
           <CardDescription>Per asset, in USD. Bars below zero are losses.</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex min-w-0 flex-col gap-3">
           {rows.length === 0 ? (
             <Empty className="border">
               <EmptyHeader>
@@ -79,9 +79,10 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
               <div
                 role="img"
                 aria-label={`Bar chart of realized and unrealized P&L per asset. ${summary}`}
+                className="min-w-0"
               >
-                <ChartContainer config={config} className="aspect-auto h-72 w-full">
-                  <BarChart data={rows} margin={{ left: 4, right: 8, top: 8 }}>
+                <ChartContainer config={config} className="aspect-auto h-64 w-full sm:h-72">
+                  <BarChart data={rows} margin={{ left: 0, right: 4, top: 8 }}>
                     <defs>
                       <pattern
                         id="pnl-unrealized-hatch"
@@ -95,11 +96,19 @@ export function PnlChart({ holdings }: { holdings: Holding[] }) {
                       </pattern>
                     </defs>
                     <CartesianGrid vertical={false} />
-                    <XAxis dataKey="symbol" tickLine={false} axisLine={false} tickMargin={8} />
-                    <YAxis
-                      width={56}
+                    <XAxis
+                      dataKey="symbol"
                       tickLine={false}
                       axisLine={false}
+                      tickMargin={8}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <YAxis
+                      width={44}
+                      tickCount={5}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontSize: 11 }}
                       tickFormatter={(v: number) => formatCompactUsd(v)}
                     />
                     <ReferenceLine y={0} stroke="var(--foreground)" strokeOpacity={0.5} />

@@ -21,10 +21,10 @@ function SummaryCard({
   note?: ReactNode
 }) {
   return (
-    <Card size="sm">
-      <CardHeader>
+    <Card size="sm" className="min-w-0">
+      <CardHeader className="min-w-0">
         <CardDescription>{label}</CardDescription>
-        <CardTitle className="text-2xl tabular-nums">{value}</CardTitle>
+        <CardTitle className="text-lg tabular-nums sm:text-xl lg:text-2xl">{value}</CardTitle>
       </CardHeader>
       <CardContent className="min-h-4 text-xs text-muted-foreground">
         {note}
@@ -41,7 +41,7 @@ export function SummaryCards({ summary }: { summary: PortfolioSummary }) {
       <h2 id="summary-heading" className="sr-only">
         Portfolio summary
       </h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <SummaryCard
           label="Portfolio value"
           value={formatUsd(summary.portfolioValue)}
@@ -54,17 +54,17 @@ export function SummaryCards({ summary }: { summary: PortfolioSummary }) {
         />
         <SummaryCard
           label="Realized P&L"
-          value={<PnlValue value={summary.realizedPnl} align="start" />}
+          value={<PnlValue value={summary.realizedPnl} align="start" className="flex-wrap" />}
           note="From closed and partially sold positions"
         />
         <SummaryCard
           label="Unrealized P&L"
-          value={<PnlValue value={summary.unrealizedPnl} align="start" />}
+          value={<PnlValue value={summary.unrealizedPnl} align="start" className="flex-wrap" />}
           note={
             summary.unrealizedPnlPct === null ? (
               "No cost basis to compare against"
             ) : (
-              <span className="inline-flex items-center gap-1">
+              <span className="inline-flex flex-wrap items-center gap-x-1">
                 <PnlValue value={summary.unrealizedPnlPct} kind="percent" align="start" />
                 <span>of cost basis</span>
               </span>
@@ -73,7 +73,7 @@ export function SummaryCards({ summary }: { summary: PortfolioSummary }) {
         />
         <SummaryCard
           label="Total P&L"
-          value={<PnlValue value={summary.totalPnl} align="start" />}
+          value={<PnlValue value={summary.totalPnl} align="start" className="flex-wrap" />}
           note="Realized + unrealized"
         />
         <SummaryCard
