@@ -34,6 +34,8 @@ There are none. The app reads no environment variables, has no `.env` file, and 
 | `pnpm dev` | Vite dev server |
 | `pnpm test` | Runs all tests once (`vitest run`; files `src/**/*.test.ts`) |
 | `pnpm test:watch` | Vitest in watch mode |
+| `pnpm test:e2e:install` | One-time: downloads the Playwright Chromium browser |
+| `pnpm test:e2e` | Playwright E2E tests (starts Vite in `e2e` mode on port 4173); see [docs/testing.md](docs/testing.md) |
 | `pnpm typecheck` | `tsc -b` (type-checks app and tooling projects) |
 | `pnpm lint` | `eslint .` |
 | `pnpm format` | `prettier --write "**/*.{ts,tsx}"` |

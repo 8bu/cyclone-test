@@ -58,7 +58,8 @@ Path alias: `@/` maps to `src/`.
 
 ## Testing policy
 
-- Tests gate only what can silently break correctness: the domain layer (`src/domain/portfolio.test.ts`, `src/domain/import.test.ts`). Environment is `node`; there are no component tests.
+- Unit tests (vitest) gate the domain layer (`src/domain/portfolio.test.ts`, `src/domain/import.test.ts`). Environment is `node`; there are no component tests.
+- Playwright E2E (`e2e/*.spec.ts`, `pnpm test:e2e`) gate the MSW backend and UI states: atomic import, API status codes, storage fallback, loading/error/empty/missing-price/error-boundary states. Failures are forced only through `window.__e2e.simulate(...)` (exists only with `vite --mode e2e`); `page.route` cannot mock the MSW service worker. See [docs/testing.md](docs/testing.md).
 - Change calculation or validation code only together with its tests. Keep the golden numbers in `src/domain/portfolio.test.ts` (sample data, 6 dp) in sync with [docs/calculation.md](docs/calculation.md). Do not edit an expected number to make a test pass without understanding why it changed.
 - Run `pnpm test`, `pnpm lint` and `pnpm build` before finishing a change.
 
